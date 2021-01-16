@@ -5,28 +5,30 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import io.basic.reactive.domain.User;
+import io.basic.reactive.domain.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@AllArgsConstructor
 public class UserServiceRepoImpl implements UserService {
+
+	private UserRepository repo;
 
 	@Override
 	public Mono<String> create(String name, String email) {
-		UUID id = UUID.randomUUID();
-		new User(id, name, email);
-		return Mono.just(id.toString());
+		return this.repo.save(new User(UUID.randomUUID(), name, email)).map(user -> user.getId().toString());
 	}
 
 	@Override
 	public Flux<User> getAll() {
-		return Flux.just(new User(UUID.randomUUID(), "Name 1", "sadasd@kljhkjh.net"),
-				new User(UUID.randomUUID(), "Name 2", "wwwqw@jkiui.net"));
+		return this.repo.getAll();
 	}
 
 	@Override
 	public Mono<User> get(String id) {
-		return Mono.just(new User(UUID.randomUUID(), "Name 3", "sdsd9jk@jkiui.net"));
+		return this.repo.get(UUID.fromString(id));
 	}
 
 }
